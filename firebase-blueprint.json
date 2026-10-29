@@ -1,0 +1,316 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile, VIP progression, creator view counters, and earnings balances in paise.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the user." },
+        "username": { "type": "string", "description": "Unique handle (3-30 chars)." },
+        "displayName": { "type": "string", "description": "Display name (1-60 chars)." },
+        "bio": { "type": "string", "description": "Profile bio (0-250 chars)." },
+        "avatarUrl": { "type": "string", "description": "Avatar URL (0-500 chars)." },
+        "vipLevel": { "type": "integer", "description": "VIP progression level (1-50)." },
+        "vipXp": { "type": "integer", "description": "VIP experience points." },
+        "diamondBalance": { "type": "integer", "description": "Current wallet diamond balance." },
+        "followersCount": { "type": "integer", "description": "Number of followers." },
+        "followingCount": { "type": "integer", "description": "Number of followed creators." },
+        "eligibleVideoViews": { "type": "integer", "description": "Verified eligible long-video views." },
+        "eligibleReelViews": { "type": "integer", "description": "Verified eligible vertical Reel views." },
+        "eligiblePhotoViews": { "type": "integer", "description": "Verified eligible photo post views." },
+        "invalidViewsCount": { "type": "integer", "description": "Rejected or duplicate views filtered out." },
+        "pendingEarningsPaise": { "type": "integer", "description": "Pending creator earnings in INR paise." },
+        "approvedEarningsPaise": { "type": "integer", "description": "Approved creator earnings in INR paise eligible for withdrawal." },
+        "paidEarningsPaise": { "type": "integer", "description": "Total paid out earnings in INR paise." },
+        "accountStatus": { "type": "string", "enum": ["active", "warned", "suspended", "banned"], "description": "Moderation account status enforced on backend." },
+        "statusReason": { "type": "string", "description": "Reason recorded for moderation status." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "userId", "username", "displayName", "bio", "avatarUrl", "vipLevel", "vipXp",
+        "diamondBalance", "followersCount", "followingCount", "eligibleVideoViews",
+        "eligibleReelViews", "eligiblePhotoViews", "invalidViewsCount",
+        "pendingEarningsPaise", "approvedEarningsPaise", "paidEarningsPaise",
+        "accountStatus", "statusReason", "createdAt", "updatedAt"
+      ]
+    },
+    "MediaPost": {
+      "title": "MediaPost",
+      "description": "Video, Reel, or Multi-Photo post with engagement metrics.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "description": "Creator UID." },
+        "authorName": { "type": "string", "description": "Creator display name." },
+        "postType": { "type": "string", "enum": ["video", "reel", "photo"], "description": "Content format." },
+        "title": { "type": "string", "description": "Post title or caption header." },
+        "description": { "type": "string", "description": "Full description or photo caption." },
+        "hashtags": { "type": "string", "description": "Comma-separated or space-separated hashtags string (0-200 chars)." },
+        "mediaCount": { "type": "integer", "description": "Number of media items in post (1-10)." },
+        "mediaUri": { "type": "string", "description": "Primary media URI or identifier." },
+        "thumbnailTitle": { "type": "string", "description": "Visual thumbnail label/theme." },
+        "durationSeconds": { "type": "integer", "description": "Duration in seconds (0 for photo posts)." },
+        "viewsCount": { "type": "integer", "description": "Validated unique view count." },
+        "likesCount": { "type": "integer", "description": "Total likes count." },
+        "commentsCount": { "type": "integer", "description": "Total comments count." },
+        "sharesCount": { "type": "integer", "description": "Total shares count." },
+        "visibility": { "type": "string", "enum": ["public", "removed"], "description": "Moderation visibility." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "authorId", "authorName", "postType", "title", "description", "hashtags",
+        "mediaCount", "mediaUri", "thumbnailTitle", "durationSeconds", "viewsCount",
+        "likesCount", "commentsCount", "sharesCount", "visibility", "createdAt", "updatedAt"
+      ]
+    },
+    "PostViewRecord": {
+      "title": "PostViewRecord",
+      "description": "Unique view ledger entry per viewer per post to prevent duplicate view inflation.",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string", "description": "Target post ID." },
+        "viewerId": { "type": "string", "description": "Authenticated viewer UID." },
+        "postType": { "type": "string", "enum": ["video", "reel", "photo"], "description": "Media type viewed." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": ["postId", "viewerId", "postType", "createdAt"]
+    },
+    "PostComment": {
+      "title": "PostComment",
+      "description": "User comment on a video, reel, or photo post.",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string", "description": "Parent post ID." },
+        "authorId": { "type": "string", "description": "Comment author UID." },
+        "authorName": { "type": "string", "description": "Comment author name." },
+        "text": { "type": "string", "description": "Comment text (1-500 chars)." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": ["postId", "authorId", "authorName", "text", "createdAt"]
+    },
+    "UserFollow": {
+      "title": "UserFollow",
+      "description": "Follow relationship between two users.",
+      "type": "object",
+      "properties": {
+        "followerId": { "type": "string", "description": "UID of the follower." },
+        "targetUserId": { "type": "string", "description": "UID of the creator being followed." },
+        "targetName": { "type": "string", "description": "Display name of creator being followed." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": ["followerId", "targetUserId", "targetName", "createdAt"]
+    },
+    "LiveStream": {
+      "title": "LiveStream",
+      "description": "Live broadcast room and two-person PK battle state.",
+      "type": "object",
+      "properties": {
+        "hostId": { "type": "string", "description": "Broadcaster UID." },
+        "hostName": { "type": "string", "description": "Broadcaster display name." },
+        "title": { "type": "string", "description": "Broadcast title." },
+        "streamCategory": { "type": "string", "description": "Broadcast category." },
+        "status": { "type": "string", "enum": ["live", "pk_battle", "ended"], "description": "Broadcast status." },
+        "viewerCount": { "type": "integer", "description": "Active viewer count." },
+        "isPkBattle": { "type": "boolean", "description": "Whether two-person PK mode is active." },
+        "opponentId": { "type": "string", "description": "Second creator UID in PK battle." },
+        "opponentName": { "type": "string", "description": "Second creator name in PK battle." },
+        "hostPkScore": { "type": "integer", "description": "Host battle score from verified gift transactions." },
+        "opponentPkScore": { "type": "integer", "description": "Opponent battle score from verified gift transactions." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "hostId", "hostName", "title", "streamCategory", "status", "viewerCount",
+        "isPkBattle", "opponentId", "opponentName", "hostPkScore", "opponentPkScore",
+        "createdAt", "updatedAt"
+      ]
+    },
+    "LiveChatMessage": {
+      "title": "LiveChatMessage",
+      "description": "Real-time chat or verified gift message inside a live stream.",
+      "type": "object",
+      "properties": {
+        "streamId": { "type": "string", "description": "Parent live stream ID." },
+        "senderId": { "type": "string", "description": "Sender UID." },
+        "senderName": { "type": "string", "description": "Sender display name." },
+        "messageText": { "type": "string", "description": "Chat text." },
+        "isGiftAlert": { "type": "boolean", "description": "True if generated by a diamond gift." },
+        "giftAmountDiamonds": { "type": "integer", "description": "Diamond value of gift." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "streamId", "senderId", "senderName", "messageText",
+        "isGiftAlert", "giftAmountDiamonds", "createdAt"
+      ]
+    },
+    "WalletTransaction": {
+      "title": "WalletTransaction",
+      "description": "Auditable ledger entry for diamond purchase orders and gift transactions.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Account owner UID." },
+        "txType": { "type": "string", "enum": ["diamond_purchase", "gift_sent", "pk_battle_gift"], "description": "Transaction type." },
+        "packageId": { "type": "string", "description": "Package or gift identifier." },
+        "diamondsDelta": { "type": "integer", "description": "Diamond change amount." },
+        "amountInrPaise": { "type": "integer", "description": "INR value in paise." },
+        "recipientId": { "type": "string", "description": "Recipient creator UID for gifts." },
+        "streamId": { "type": "string", "description": "Associated live stream ID if applicable." },
+        "verificationStatus": { "type": "string", "enum": ["pending_backend_verification", "verified", "rejected"], "description": "Server payment verification status." },
+        "paymentRef": { "type": "string", "description": "External order or transaction reference." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "userId", "txType", "packageId", "diamondsDelta", "amountInrPaise",
+        "recipientId", "streamId", "verificationStatus", "paymentRef", "createdAt"
+      ]
+    },
+    "BankAccount": {
+      "title": "BankAccount",
+      "description": "Creator payout bank account destination subject to verification.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner creator UID." },
+        "accountHolderName": { "type": "string", "description": "Beneficiary full name." },
+        "bankName": { "type": "string", "description": "Bank institution name." },
+        "accountNumberMasked": { "type": "string", "description": "Account number." },
+        "ifscCode": { "type": "string", "description": "Bank IFSC code." },
+        "verificationStatus": { "type": "string", "enum": ["pending", "verified", "rejected"], "description": "Verification state." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "userId", "accountHolderName", "bankName", "accountNumberMasked",
+        "ifscCode", "verificationStatus", "createdAt", "updatedAt"
+      ]
+    },
+    "WithdrawalRequest": {
+      "title": "WithdrawalRequest",
+      "description": "Creator withdrawal request requiring Level 30 and minimum Rs 10,000 balance.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Creator UID." },
+        "bankAccountId": { "type": "string", "description": "Verified bank account ID." },
+        "amountInrPaise": { "type": "integer", "description": "Requested payout in paise (min 1,000,000 = Rs 10,000)." },
+        "userVipLevelAtRequest": { "type": "integer", "description": "Creator level at request time (min 30)." },
+        "status": { "type": "string", "enum": ["pending_review", "approved", "paid", "rejected"], "description": "Payout lifecycle state." },
+        "scheduledPayoutDay": { "type": "integer", "description": "Monthly payout day (18)." },
+        "adminNote": { "type": "string", "description": "Admin verification note." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "userId", "bankAccountId", "amountInrPaise", "userVipLevelAtRequest",
+        "status", "scheduledPayoutDay", "adminNote", "createdAt", "updatedAt"
+      ]
+    },
+    "ModerationReport": {
+      "title": "ModerationReport",
+      "description": "User-submitted content or account moderation report and appeal record.",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string", "description": "UID of reporting user." },
+        "targetType": { "type": "string", "enum": ["photo", "video", "reel", "live_stream", "user_profile", "chat_message"], "description": "Type of reported target." },
+        "targetId": { "type": "string", "description": "ID of reported entity." },
+        "reasonCategory": { "type": "string", "enum": ["explicit_content", "illegal_content", "harassment", "threats_danger", "impersonation_scam", "copyright"], "description": "Guideline violation category." },
+        "details": { "type": "string", "description": "Report description." },
+        "status": { "type": "string", "enum": ["open", "actioned", "dismissed", "appealed"], "description": "Moderation status." },
+        "moderationAction": { "type": "string", "description": "Action taken and reason logged by admin." },
+        "appealText": { "type": "string", "description": "Appeal statement if submitted." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "reporterId", "targetType", "targetId", "reasonCategory", "details",
+        "status", "moderationAction", "appealText", "createdAt", "updatedAt"
+      ]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Customer support ticket with category, status, and admin reply.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Requester UID." },
+        "category": { "type": "string", "enum": ["login_problems", "video_upload_problems", "live_streaming_problems", "diamond_payment_problems", "earnings_withdrawal", "account_bans_appeals", "other_issues"], "description": "Complaint category." },
+        "subject": { "type": "string", "description": "Short ticket subject." },
+        "message": { "type": "string", "description": "Detailed issue description." },
+        "status": { "type": "string", "enum": ["open", "in_progress", "resolved", "closed"], "description": "Ticket lifecycle status." },
+        "adminReply": { "type": "string", "description": "Official support response." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": [
+        "userId", "category", "subject", "message",
+        "status", "adminReply", "createdAt", "updatedAt"
+      ]
+    },
+    "UserNotification": {
+      "title": "UserNotification",
+      "description": "Per-user notification item for live streams, follows, gifts, and moderation.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Recipient UID." },
+        "title": { "type": "string", "description": "Notification title." },
+        "body": { "type": "string", "description": "Notification message." },
+        "notifType": { "type": "string", "enum": ["live", "follow", "gift", "moderation", "system"], "description": "Notification category." },
+        "isRead": { "type": "boolean", "description": "Read state." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": ["userId", "title", "body", "notifType", "isRead", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profiles, VIP levels, view counters, and creator earnings."
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/MediaPost" },
+      "description": "Videos, Reels, and Photo posts."
+    },
+    "/posts/{postId}/views/{viewerId}": {
+      "schema": { "$ref": "#/entities/PostViewRecord" },
+      "description": "Deduplicated per-user view records."
+    },
+    "/posts/{postId}/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/PostComment" },
+      "description": "Comments on posts."
+    },
+    "/follows/{followId}": {
+      "schema": { "$ref": "#/entities/UserFollow" },
+      "description": "Creator follow relationships."
+    },
+    "/live_streams/{streamId}": {
+      "schema": { "$ref": "#/entities/LiveStream" },
+      "description": "Live broadcasts and two-person PK battles."
+    },
+    "/live_streams/{streamId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/LiveChatMessage" },
+      "description": "Real-time live stream chat and gift alerts."
+    },
+    "/wallet_transactions/{txId}": {
+      "schema": { "$ref": "#/entities/WalletTransaction" },
+      "description": "Auditable diamond purchase and gift transaction ledger."
+    },
+    "/bank_accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/BankAccount" },
+      "description": "Creator payout bank accounts."
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": { "$ref": "#/entities/WithdrawalRequest" },
+      "description": "Creator earnings withdrawal requests."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/ModerationReport" },
+      "description": "Content and user moderation reports and appeals."
+    },
+    "/support_tickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/SupportTicket" },
+      "description": "Customer support tickets."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/UserNotification" },
+      "description": "User notifications."
+    }
+  }
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <!-- Outer Neon Halo Ring -->
+    <path
+        android:pathData="M48,6 A42,42 0 1,1 47.9,6 Z"
+        android:strokeWidth="2.5"
+        android:fillColor="#1A8B5CF6">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="6"
+                android:startY="6"
+                android:endX="90"
+                android:endY="90"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF38BDF8" />
+                <item android:offset="0.5" android:color="#FF8B5CF6" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Main Neon Star -->
+    <path
+        android:pathData="M48,14 L57.5,35.2 L80.6,37.8 L63.4,53.2 L68.1,76.0 L48,64.2 L27.9,76.0 L32.6,53.2 L15.4,37.8 L38.5,35.2 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFFFF">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="15"
+                android:startY="14"
+                android:endX="80"
+                android:endY="76"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF38BDF8" />
+                <item android:offset="0.55" android:color="#FF8B5CF6" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Inner Play Emblem -->
+    <path
+        android:fillColor="#FF080914"
+        android:pathData="M42,39 L58,49 L42,59 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M43.5,41.5 L55.5,49 L43.5,56.5 Z" />
+</vector>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group
+        android:scaleX="0.55"
+        android:scaleY="0.55"
+        android:translateX="5.4"
+        android:translateY="5.4">
+        <!-- Bold filled Neon Star with Play Core silhouette -->
+        <path
+            android:pathData="M12,1.5 L14.9,8.2 L22.2,8.9 L16.7,13.7 L18.3,20.8 L12,17.1 L5.7,20.8 L7.3,13.7 L1.8,8.9 L9.1,8.2 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="2"
+                    android:startY="2"
+                    android:endX="22"
+                    android:endY="21"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#FF38BDF8" />
+                    <item android:offset="0.5" android:color="#FF8B5CF6" />
+                    <item android:offset="1.0" android:color="#FFEC4899" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M10.2,9.2 L15.2,12.2 L10.2,15.2 Z" />
+    </group>
+</vector>

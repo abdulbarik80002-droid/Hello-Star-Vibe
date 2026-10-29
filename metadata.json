@@ -1,0 +1,6 @@
+{
+  "name": "Hello Star Vibe",
+  "description": "Social media, short video, Reels, photo sharing, live PK streaming, diamond wallet, creator monetization, VIP progression, and admin moderation platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
