@@ -1,119 +1,89 @@
-name: Android CI
+name: Hello Star Live Android APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [main, master]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [main, master]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    name: Build Hello Star Vibe Debug APK
+    name: Build Debug APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Checkout repository
+      - name: Checkout source
         uses: actions/checkout@v5
 
-      - name: 2. Set up JDK 17 & 21 (Required for Gradle 9.3.1 & AGP 9.1.1)
+      - name: Set up Java 17
         uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: |
-            17
-            21
-          name: Hello Star Live Android Build
-
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Android SDK Information
+      - name: Install required Android SDK packages
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          adb version
-          sdkmanager --version
-          packages: 'tools platform-tools'
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-36.1" \
+            "build-tools;36.0.0"
 
-      - name: 4. Install Android SDK Platform 36 / 36.1 & Build-Tools 36.0.0
+      - name: Locate Android project and restore Gradle wrapper
+        shell: bash
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-36" "platforms;android-36.1" "build-tools;36.0.0" || sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
-
-      - name: 5. Set up Gradle 9.3.1
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.3.1'
-          cache-disabled: true
-
-      - name: 6. Locate Android Project Root & Restore Gradle Wrapper and Keystore
-        run: |
+          set -euo pipefail
           PROJECT_DIR="."
-          if [ ! -f "settings.gradle.kts" ] && [ ! -f "settings.gradle" ]; then
-            FOUND_SETTINGS=$(find . -maxdepth 3 -name "settings.gradle*" | head -n 1 || true)
-            if [ -n "$FOUND_SETTINGS" ]; then
-              PROJECT_DIR=$(dirname "$FOUND_SETTINGS")
-              echo "Located Android Gradle project in subfolder: $PROJECT_DIR"
-            else
-              echo "::error::Android Gradle project files (settings.gradle.kts, app/build.gradle.kts) were not found in this repository."
-              echo "::error::Please push all project files from Google AI Studio ('Push to GitHub' or 'Download ZIP') to this GitHub repository."
+          if [[ ! -f "settings.gradle.kts" && ! -f "settings.gradle" ]]; then
+            SETTINGS_FILE="$(find . -maxdepth 4 -type f \\( -name settings.gradle.kts -o -name settings.gradle \\) | head -n 1)"
+            if [[ -z "$SETTINGS_FILE" ]]; then
+              echo "::error::Android project settings.gradle(.kts) not found."
               exit 1
             fi
+            PROJECT_DIR="$(dirname "$SETTINGS_FILE")"
           fi
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           cd "$PROJECT_DIR"
 
-          if [ -f "gradle/wrapper/gradle-wrapper.jar.base64" ] && [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            base64 -d gradle/wrapper/gradle-wrapper.jar.base64 > gradle/wrapper/gradle-wrapper.jar
+          if [[ ! -f gradle/wrapper/gradle-wrapper.jar && -f gradle/wrapper/gradle-wrapper.jar.base64 ]]; then
+            base64 --decode gradle/wrapper/gradle-wrapper.jar.base64 > gradle/wrapper/gradle-wrapper.jar
           fi
 
-          if [ ! -f "gradlew" ] || [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            gradle wrapper
+          if [[ ! -f gradlew ]]; then
+            echo "::error::gradlew is missing from the Android project."
+            exit 1
           fi
-
+          if [[ ! -f gradle/wrapper/gradle-wrapper.jar ]]; then
+            echo "::error::Gradle wrapper JAR could not be restored."
+            exit 1
+          fi
           chmod +x gradlew
 
-          if [ -f "debug.keystore.base64" ] && [ ! -f "debug.keystore" ]; then
-            base64 -d debug.keystore.base64 > debug.keystore
-          elif [ ! -f "debug.keystore" ]; then
-            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-          fi
-
-      - name: 7. Verify Gradle Wrapper Version
+      - name: Verify Gradle wrapper
         working-directory: ${{ env.PROJECT_DIR }}
         run: ./gradlew --version
 
-      - name: 8. Build Debug APK with Gradle
+      - name: Build Debug APK
         working-directory: ${{ env.PROJECT_DIR }}
-        run: ./gradlew assembleDebug --stacktrace --no-daemon
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
 
-      - name: 9. Verify Debug APK Exists
+      - name: Verify APK
         working-directory: ${{ env.PROJECT_DIR }}
-        run: ls -lh app/build/outputs/apk/debug/app-debug.apk
+        run: |
+          test -f app/build/outputs/apk/debug/app-debug.apk
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
 
-      - name: 10. Upload Debug APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: HelloStarVibe-debug-apk
+          name: Hello-Star-Live-debug-apk
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          retention-days: 14
